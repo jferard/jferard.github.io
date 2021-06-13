@@ -63,11 +63,57 @@ $(function() {
 </iframe>
 </div>
 
-<div class="header">
+<div class="PageDoc"><div class="header">
   <div class="headertitle">
 <div class="title">MoreBasicFunctions Documentation</div>  </div>
 </div><!--header-->
 <div class="contents">
+<div class="textblock"><p><b>MoreBasicFunctions</b> - A LibreOffice Add-On written in Java that provides more basic functions.</p>
+<p>Copyright (C) 2021 Julien Férard.</p>
+<p>Questions: <a href="https://github.com/jferard/MoreBasicFunctions/discussions">https://github.com/jferard/MoreBasicFunctions/discussions</a></p>
+<p>Bug reports: <a href="https://github.com/jferard/MoreBasicFunctions/issues">https://github.com/jferard/MoreBasicFunctions/issues</a></p>
+<p>Documentation: <a href="https://jferard.github.io/MoreBasicFunctions">https://jferard.github.io/MoreBasicFunctions</a></p>
+<h1><a class="anchor" id="autotoc_md0"></a>
+Overview</h1>
+<p>On one hand, LibreOffice Basic is pretty limited, functions names are unusual (think of <code>Mid</code>!). On the other hand, Calc functions are powerful, but cumbersome to call because of a tedious syntax. Hence the idea of this add-on: <code>MoreBasicFunctions</code> exposes very common function as UNO services. <br  />
+</p>
+<p><b>There is a major limitation: the services won't be available unless the add-on is installed. That means that your scripts won't be usable on a standard LibreOffice installation.</b> <br  />
+</p>
+<p>Use cases:</p>
+<ul>
+<li>One PC script (typically personal script): install the add-on on the PC and use the services;</li>
+<li>Prototype: the add-on will help you to write clean code;</li>
+<li>Developer: the <code>Tests</code> service is mandatory on the developer PC but not on the end user PC.</li>
+</ul>
+<p>There are several services: <code>Tests</code>, <code>Strings</code>, <code>Characters</code>, <code>Regexes</code>, <code>Collections</code>, <code>Dates</code>, <code>Paths</code>.</p>
+<h2><a class="anchor" id="autotoc_md1"></a>
+Tests</h2>
+<p>Some Junit like functions: <code>assertTrue</code>, <code>assertFalse</code>, <code>assertEquals</code>, <code>assertNotEquals</code>, <code>assertArrayEquals</code>, <code>assertArrayNotEquals</code>.</p>
+<h2><a class="anchor" id="autotoc_md2"></a>
+Strings</h2>
+<p>For string manipulation: <code>reversed</code>, <code>split</code>, <code>join</code>, <code>lower</code>/<code>upper</code> case, <code>indexOf</code>, <code>substring</code>...</p>
+<h2><a class="anchor" id="autotoc_md3"></a>
+Characters</h2>
+<p>For character manipulation <code>Ord</code>/<code>Chr</code> and identification: <code>isLetter</code>, <code>isDigit</code>...</p>
+<h2><a class="anchor" id="autotoc_md4"></a>
+Regexes</h2>
+<p>For regex usage: <code>match</code>, <code>findAll</code>/<code>findFirst</code>, <code>replaceAll</code>/<code>replaceFirst</code>.</p>
+<h2><a class="anchor" id="autotoc_md5"></a>
+Collections</h2>
+<p>For collections manipulation: <code>sort</code>, <code>shuffle</code>, <code>min</code>, <code>max</code>, <code>avg</code>, <code>concat</code>, <code>flatten</code>, <code>times</code>, <code>chunks</code>, <code>randomElement</code>, <code>contains</code>.</p>
+<h2><a class="anchor" id="autotoc_md6"></a>
+Dates</h2>
+<p>For date and time manipulation: <code>now</code>, <code>strptime</code>/<code>strftime</code>...</p>
+<h2><a class="anchor" id="autotoc_md7"></a>
+Paths</h2>
+<p>For path manipulation: <code>list</code>, <code>recursiveList</code>, <code>split</code>/<code>join</code>, <code>parent</code>, <code>withExtension</code>...</p>
+<h1><a class="anchor" id="autotoc_md8"></a>
+Example</h1>
+<p>To replace a string by another in a string using a Calc function call: </p><pre class="fragment">functionAccess = createUnoService("com.sun.star.sheet.FunctionAccess")  
+MsgBox functionAccess.callFunction("SUBSTITUTE", Array("123123123", "3", "abc"))
+</pre><p>Using MoreBasicFunctions: </p><pre class="fragment">Strings = createUnoService("com.github.jferard.mbfs.Strings")
+MsgBox Strings.replace("123123123", "3", "abc")
+</pre> </div></div><!-- PageDoc -->
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
