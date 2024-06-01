@@ -5,25 +5,27 @@
     <title>onRecords</title>
     <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
     <script>
-      grist.ready({
-         requiredAccess : 'full'
-      });
+      window.addEventListener("load", (event) => {
+        grist.ready({
+           requiredAccess : 'full'
+        });
 
-      const table = grist.getTable("MATABLE");
-      document.getElementById("f").addEventListener("submit", async function (e) {
-        await table.upsert({
-          fields: {
-            A: document.getElementById("A").value,
-            B: document.getElementById("B").value,
-            C: document.getElementById("C").value
-          },
-          require: {}
-        })
+        const table = grist.getTable("MATABLE");
+        document.getElementById("theform").addEventListener("submit", async function (e) {
+          await table.upsert({
+            fields: {
+              A: document.getElementById("A").value,
+              B: document.getElementById("B").value,
+              C: document.getElementById("C").value
+            },
+            require: {}
+          })
+        });
       });
     </script>
   </head>
   <body>
-    <form id="f">
+    <form id="theform">
       <input type="text" name="A" id="A"><br>
       <input type="text" name="B" id="B"><br>
       <input type="text" name="C" id="C"><br>
