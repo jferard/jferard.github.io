@@ -10,7 +10,7 @@
       });
 
       const table = grist.getTable("MATABLE");
-      document.getElementById("f").addEventListener("submit", function (e) {
+      document.getElementById("f").addEventListener("submit", async function (e) {
         await table.upsert({
           fields: {
             A: document.getElementById("A").value,
