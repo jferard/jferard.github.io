@@ -12,6 +12,7 @@
 
         const table = grist.getTable("MATABLE");
         document.getElementById("theform").addEventListener("submit", async function (e) {
+          e.preventDefault();
           await table.upsert({
             fields: {
               A: document.getElementById("A").value,
@@ -29,7 +30,7 @@
       <input type="text" name="A" id="A"><br>
       <input type="text" name="B" id="B"><br>
       <input type="text" name="C" id="C"><br>
-      <input type="button" value="Submit" id='submit' >
+      <input type="submit" value="Submit">
     </form>
   </body>
 </html>
