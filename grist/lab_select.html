@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta name="format-detection" content="telephone=no,date=no,address=no,email=no,url=no" />
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="css/dsfr.min.css" />
+    <link rel="stylesheet" href="css/utility.min.css" />
+    <link rel="stylesheet" href="css/dsfr.print.min.css" />
+    <link rel="stylesheet" href="css/extra-styles.css" />
+    <script src="js/dsfr.module.min.js" type="text/javascript"></script>
+    <script src="js/dsfr.nomodule.min.js" nomodule="" type="text/javascript"></script>
+
+    <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
+
+    <!-- tomselect -->
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/css/tom-select.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/js/tom-select.complete.min.js"></script>
+
+    <!-- Uses Vue.js and the Grist Plugin API -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.3/vue.min.js"></script>
+
+    <script src="lab_select.js?version=1"></script>
+
+    <title>Lab Innov</title>
+  </head>
+<body>
+
+<main id="content" role="main">
+    <section v-if="curSollicitation === null" style="min-height: 100px" class="fr-my-3v">
+        <div class="fr-grid-row fr-grid-row--gutters">
+            <div class="fr-col">
+                <h2>Chercher une sollicitation</h2>
+<div role="search" class="fr-search-bar">
+    <label class="fr-label">Chercher une
+        sollicitation</label>
+    <input type="search" v-model="searchString"
+           placeholder="Chercher une sollicitation"
+           class="fr-input"/>
+    <div aria-live="polite"
+         class="fr-messages-group"></div>
+    <button type="button"
+            title="Chercher une sollicitation"
+            class="fr-btn">Chercher une sollicitation
+    </button>
+</div>
+<div class="fr-grid-row fr-grid-row--gutters">
+    <div>
+        <ul>
+            
+            <li v-for="sollicitation in foundSollicitations"
+                :key="sollicitation.id">
+                <button class="fr-btn" type="button"
+                        v-on:click="chooseSollicitation(sollicitation.id)"
+                        v-bind:name="sollicitation.id">
+                    {{sollicitation.id}} - {{sollicitation.Identifiant}}
+                </button>
+                : {{sollicitation.Description}}
+            </li>
+            
+        </ul>
+    </div>
+</div>
+            </div>
+        </div>
+    </section>
+    <section v-else  style="min-height: 100px" class="fr-my-3v">
+        <div  class="fr-grid-row fr-grid-row--gutters">
+            
+            <div class="fr-callout">
+              <h3 class="fr-callout__title">{{curSollicitation.Identifiant}}</h3>
+              <p class="fr-callout__text">{{curSollicitation.Description}}</p>
+            <button class="fr-btn" type="button" @click="resetCurSollicitation">X</button>
+            </div>
+            
+        </div>
+        <div class="fr-grid-row fr-grid-row--gutters">
+            <div class="fr-tabs">
+    <ul class="fr-tabs__list" role="tablist"
+        aria-label="Réunions, etc.">
+        <li role="presentation">
+            <button type="button" id="storybook-tab-0" class="fr-tabs__tab"
+                    tabindex="0" role="tab" aria-selected="true"
+                    aria-controls="storybook-tab-0-panel">Réunions
+            </button>
+        </li>
+        <li role="presentation">
+            <button type="button" id="storybook-tab-1" class="fr-tabs__tab"
+                    tabindex="-1" role="tab" aria-selected="false"
+                    aria-controls="storybook-tab-1-panel">Travaux
+            </button>
+        </li>
+        <li role="presentation">
+            <button type="button" id="storybook-tab-2" class="fr-tabs__tab"
+                    tabindex="-1" role="tab" aria-selected="false"
+                    aria-controls="storybook-tab-2-panel">Événements
+            </button>
+        </li>
+        <li role="presentation">
+            <button type="button" id="storybook-tab-3" class="fr-tabs__tab"
+                    tabindex="-1" role="tab" aria-selected="false"
+                    aria-controls="storybook-tab-3-panel"
+                    >
+                Suites
+            </button>
+        </li>
+    </ul>
+    <div id="storybook-tab-0-panel"
+         class="fr-tabs__panel fr-tabs__panel--selected" role="tabpanel"
+         aria-labelledby="storybook-tab-0" tabindex="0">
+        
+        <div class="fr-table" id="reunions-component">
+    <div class="fr-table__wrapper">
+        <div class="fr-table__container">
+            <div class="fr-table__content">
+                <table id="reunions-table">
+                    <caption>Réunions</caption>
+                    <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Titre</th>
+                        <th>Participants Lab</th>
+                        <th>Durée</th>
+                        <th>Durée totale Lab</th>
+                        <th>Ppale</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="(action, index) in foundReunions"
+                        v-bind:id="`reunions-row-key-${index}`"
+                        v-bind:data-row-key="index"
+                        :key="action.id">
+                        
+                        <td>{{toDateString(action.Date)}}
+                        </td>
+                        <td>{{action.Titre}}</td>
+                        <td>
+                            {{action.Participants_Lab_Uniques.slice(1).join(", ")}}
+                        </td>
+                        <td>{{action.Duree_heures_.toLocaleString()}}</td>
+                        <td>{{action.Total_heures_Lab.toLocaleString()}}</td>
+                        <td>{{action.Action_principale ? "X" : ""}}</td>
+                        <td>
+                            <button data-fr-opened="false"
+                                    aria-controls="{{ modal }}"
+                                    @click="openModifyActionDialog(action.id)">📝
+                            </button>
+                            <button data-fr-opened="false"
+                                    aria-controls="remove-action-modal"
+                                    @click="openRemoveActionDialog(action.id)">❌
+                            </button>
+                            <button @click="setActionPrincipale(action.id)">🚩
+                            </button>
+                        </td>
+                        
+                    </tr>
+                    <tr>
+                        <td colspan="3">Total</td>
+                        <td>{{ foundReunions.reduce((acc, r) => acc +
+                            Number(r.Duree_heures_), 0).toLocaleString() }}
+                        </td>
+                        <td>{{ foundReunions.reduce((acc, r) => acc +
+                            Number(r.Total_heures_Lab), 0).toLocaleString() }}
+                        </td>
+                        <td></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+<button data-fr-opened="false" aria-controls="create-reunion-modal" @click='newActionDialog("R")'
+        type="button" class="fr-btn">Créer une réunion
+</button>
+<dialog id="create-reunion-modal" class="fr-modal"
+        aria-labelledby="modal-reunions-create" aria-modal="true">
+    <div class="fr-container fr-container--fluid fr-container-md">
+        <div class="fr-grid-row fr-grid-row--center">
+            <div class="fr-col-12 fr-col-md-12 fr-col-lg-12">
+                <div class="fr-modal__body">
+                    <div class="fr-modal__header">
+                        <button aria-controls="create-reunion-modal"
+                                id="create-reunion-modal-button"
+                                title="Fermer" type="button"
+                                class="fr-btn--close fr-btn">
+                            Fermer
+                        </button>
+                    </div>
+                    <div v-if="curAction" class="fr-modal__content">
+                        <h2 id="modal-reunions-create"
+                            class="fr-modal__title">
+                                            <span class="fr-icon-arrow-right-line fr-icon--lg"
+                                                  aria-hidden="true"></span>
+                            La réunion
+                        </h2>
+                        <form v-on:submit="upsertReunion"
+                              id="create-reunion-form">
+                            <input type="hidden" name="id" value="curAction.id"/>
+                            <div class="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
+                                <div class="fr-col">
+                                    <div class="fr-input-group"
+                                         id="titre-reunion">
+                                        <label class="fr-label"
+                                               for="input-titre-reunion">Titre
+                                            réunion</label>
+                                        <input class="fr-input"
+                                               aria-describedby="input-titre-reunion-messages"
+                                               id="input-titre-reunion"
+                                               name="Titre"
+                                               type="text">
+                                        <div class="fr-messages-group"
+                                             id="input-titre-reunion-messages"
+                                             aria-live="polite">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
+                                <div class="fr-col">
+                                    <div class="fr-input-group">
+                                        <label class="fr-label"
+                                               for="date-reunion-input">
+                                            Date réunion
+                                        </label>
+                                        <input class="fr-input"
+                                               aria-describedby="input-messages"
+                                               id="date-reunion-input"
+                                               name="Date"
+                                               type="date">
+                                        <div class="fr-messages-group"
+                                             id="date-reunion-input-messages"
+                                             aria-live="polite">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="fr-col">
+                                    <div class="fr-select-group">
+                                        <label class="fr-label"
+                                               for="mode-reunion-hint">
+                                            Mode de réunion
+                                        </label>
+                                        <select class="fr-select"
+                                                aria-describedby="mode-reunion-hint-messages"
+                                                id="mode-reunion-hint"
+                                                name="Mode_reunion">
+                                            <option v-for="mode in modesReunions">
+                                                
+                                            </option>
+                                        </select>
+                                        <div class="fr-messages-group"
+                                             id="mode-reunion-hint-messages"
+                                             aria-live="polite">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="fr-col">
+                                    <div class="fr-range-group"
+                                         id="range-group-duree-reunion">
+                                        <label class="fr-label"
+                                               id="duree-reunion-range-input-label">
+                                            Durée de la réunion (heures)
+                                        </label>
+                                        <div class="fr-range" data-fr-suffix=" h">
+                                            <span class="fr-range__output">1</span>
+                                            <input id="duree-reunion-range-input"
+                                                   name="Duree_heures_"
+                                                   type="range"
+                                                   aria-labelledby="duree-reunion-range-input-label"
+                                                   min="0" max="8"
+                                                   value="0"
+                                                   step="0.25"
+                                                   aria-describedby="duree-reunion-range-input-messages">
+                                            <span class="fr-range__min"
+                                                  aria-hidden="true">0</span>
+                                            <span class="fr-range__max"
+                                                  aria-hidden="true">8</span>
+                                        </div>
+                                        <div class="fr-messages-group"
+                                             id="duree-reunion-range-input-messages"
+                                             aria-live="polite">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
+                                <div class="fr-col">
+                                    <div class="fr-select-group">
+                                        <label class="fr-label"
+                                               for="participants-reunion-select">
+                                            Participants Lab
+                                        </label>
+                                        <select class="fr-select"
+                                                aria-describedby="participants-hint-messages"
+                                                id="participants-reunion-select"
+                                                name="Participants_Lab"
+                                                multiple
+                                        >
+                                            
+                                            <option v-for="participant in participants"
+                                                    v-bind:value="participant.id">
+                                                {{participant.nom}}
+                                            </option>
+                                            
+                                        </select>
+                                        <div class="fr-messages-group"
+                                             id="participants-lab-reunion-hint-messages"
+                                             aria-live="polite">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="fr-col">
+                                    <div class="fr-input-group"
+                                         id="participants-autres-reunion-div">
+                                        <label class="fr-label"
+                                               for="participants-autres-reunion">
+                                            Participants autres</label>
+                                        <textarea class="fr-input"
+                                                  name="Participants_Autres"
+                                                  aria-describedby="participants-autres-reunion-messages"
+                                                  id="participants-autres-reunion"></textarea>
+                                        <div class="fr-messages-group"
+                                             id="participants-autres-reunion-messages"
+                                             aria-live="polite">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
+                                <div class="fr-col">
+                                    <div class="fr-input-group"
+                                         id="remarques-reunion-div">
+                                        <label class="fr-label"
+                                               for="remarques-reunion">
+                                            Remarques</label>
+                                        <textarea class="fr-input"
+                                                  name="Remarques"
+                                                  aria-describedby="remarques-reunion-messages"
+                                                  id="remarques-reunion"></textarea>
+                                        <div class="fr-messages-group"
+                                             id="remarques-reunion-messages"
+                                             aria-live="polite">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
+                                <div class="fr-col">
+                                    <button v-if="curAction.id" class="fr-btn" type="submit">
+                                        Modifier
+                                    </button>
+                                    <button v-else class="fr-btn" type="submit">
+                                        Créer
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</dialog>
+
+</div>
+<dialog id="remove-action-modal" class="fr-modal" aria-labelledby="modal-title"
+        aria-modal="true">
+    <div class="fr-container fr-container--fluid fr-container-md">
+        <div class="fr-grid-row fr-grid-row--center">
+            <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
+                <div class="fr-modal__body">
+                    <div class="fr-modal__header">
+                        <button aria-controls="remove-action-modal"
+                                title="Fermer" type="button"
+                                id="action-modal-close"
+                                class="fr-btn--close fr-btn">Fermer
+                        </button>
+                    </div>
+                    <div class="fr-modal__content">
+                        <h2 id="modal-title" class="fr-modal__title">
+                            Supprimer une action
+                        </h2>
+                        <div v-html="removeActionHTML"></div>
+                        <div>
+                            <button class="fr-btn fr-btn--secondary" @click="removeAction">
+                                Supprimer
+                            </button>
+                            <button class="fr-btn" type="button" aria-controls="remove-action-modal">
+                                Abandonner
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</dialog>
+        
+    </div>
+    <div id="storybook-tab-1-panel" class="fr-tabs__panel" role="tabpanel"
+         aria-labelledby="storybook-tab-1" tabindex="0">
+        
+        <div class="fr-table" id="travaux-component">
+    <div class="fr-table__wrapper">
+        <div class="fr-table__container">
+            <div class="fr-table__content">
+                <table id="travaux-table">
+                    <caption>Travaux</caption>
+                    <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Titre</th>
+                        <th>Participants Lab</th>
+                        <th>Durée</th>
+                        <th>Durée totale Lab</th>
+                        <th>Ppale</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="(action, index) in foundTravaux"
+                        v-bind:id="`travaux-row-key-${index}`"
+                        v-bind:data-row-key="index"
+                        :key="action.id">
+                        
+                        <td>{{toDateString(action.Date)}}
+                        </td>
+                        <td>{{action.Titre}}</td>
+                        <td>
+                            {{action.Participants_Lab_Uniques.slice(1).join(", ")}}
+                        </td>
+                        <td>{{action.Duree_heures_.toLocaleString()}}</td>
+                        <td>{{action.Total_heures_Lab.toLocaleString()}}</td>
+                        <td>{{action.Action_principale ? "X" : ""}}</td>
+                        <td>
+                            <button data-fr-opened="false"
+                                    aria-controls="{{ modal }}"
+                                    @click="openModifyActionDialog(action.id)">📝
+                            </button>
+                            <button data-fr-opened="false"
+                                    aria-controls="remove-action-modal"
+                                    @click="openRemoveActionDialog(action.id)">❌
+                            </button>
+                            <button @click="setActionPrincipale(action.id)">🚩
+                            </button>
+                        </td>
+                        
+                    </tr>
+                    <tr>
+                        <td colspan="3">Total</td>
+                        <td>{{ foundTravaux.reduce((acc, r) => acc +
+                            Number(r.Duree_heures_), 0).toLocaleString() }}
+                        </td>
+                        <td>{{ foundTravaux.reduce((acc, r) => acc +
+                            Number(r.Total_heures_Lab), 0).toLocaleString() }}
+                        </td>
+                        <td></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+</div>
+<dialog id="remove-action-modal" class="fr-modal" aria-labelledby="modal-title"
+        aria-modal="true">
+    <div class="fr-container fr-container--fluid fr-container-md">
+        <div class="fr-grid-row fr-grid-row--center">
+            <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
+                <div class="fr-modal__body">
+                    <div class="fr-modal__header">
+                        <button aria-controls="remove-action-modal"
+                                title="Fermer" type="button"
+                                id="action-modal-close"
+                                class="fr-btn--close fr-btn">Fermer
+                        </button>
+                    </div>
+                    <div class="fr-modal__content">
+                        <h2 id="modal-title" class="fr-modal__title">
+                            Supprimer une action
+                        </h2>
+                        <div v-html="removeActionHTML"></div>
+                        <div>
+                            <button class="fr-btn fr-btn--secondary" @click="removeAction">
+                                Supprimer
+                            </button>
+                            <button class="fr-btn" type="button" aria-controls="remove-action-modal">
+                                Abandonner
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</dialog>
+        
+    </div>
+    <div id="storybook-tab-2-panel" class="fr-tabs__panel" role="tabpanel"
+         aria-labelledby="storybook-tab-2" tabindex="0">
+        
+        <div class="fr-table" id="evenements-component">
+    <div class="fr-table__wrapper">
+        <div class="fr-table__container">
+            <div class="fr-table__content">
+                <table id="evenements-table">
+                    <caption>Événéments</caption>
+                    <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Titre</th>
+                        <th>Participants Lab</th>
+                        <th>Durée</th>
+                        <th>Durée totale Lab</th>
+                        <th>Ppale</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="(action, index) in foundEvenements"
+                        v-bind:id="`evenements-row-key-${index}`"
+                        v-bind:data-row-key="index"
+                        :key="action.id">
+                        
+                        <td>{{toDateString(action.Date)}}
+                        </td>
+                        <td>{{action.Titre}}</td>
+                        <td>
+                            {{action.Participants_Lab_Uniques.slice(1).join(", ")}}
+                        </td>
+                        <td>{{action.Duree_heures_.toLocaleString()}}</td>
+                        <td>{{action.Total_heures_Lab.toLocaleString()}}</td>
+                        <td>{{action.Action_principale ? "X" : ""}}</td>
+                        <td>
+                            <button data-fr-opened="false"
+                                    aria-controls="{{ modal }}"
+                                    @click="openModifyActionDialog(action.id)">📝
+                            </button>
+                            <button data-fr-opened="false"
+                                    aria-controls="remove-action-modal"
+                                    @click="openRemoveActionDialog(action.id)">❌
+                            </button>
+                            <button @click="setActionPrincipale(action.id)">🚩
+                            </button>
+                        </td>
+                        
+                    </tr>
+                    <tr>
+                        <td colspan="3">Total</td>
+                        <td>{{ foundEvenements.reduce((acc, r) => acc +
+                            Number(r.Duree_heures_), 0).toLocaleString() }}
+                        </td>
+                        <td>{{ foundEvenements.reduce((acc, r) => acc +
+                            Number(r.Total_heures_Lab), 0).toLocaleString() }}
+                        </td>
+                        <td></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+</div>
+<dialog id="remove-action-modal" class="fr-modal" aria-labelledby="modal-title"
+        aria-modal="true">
+    <div class="fr-container fr-container--fluid fr-container-md">
+        <div class="fr-grid-row fr-grid-row--center">
+            <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
+                <div class="fr-modal__body">
+                    <div class="fr-modal__header">
+                        <button aria-controls="remove-action-modal"
+                                title="Fermer" type="button"
+                                id="action-modal-close"
+                                class="fr-btn--close fr-btn">Fermer
+                        </button>
+                    </div>
+                    <div class="fr-modal__content">
+                        <h2 id="modal-title" class="fr-modal__title">
+                            Supprimer une action
+                        </h2>
+                        <div v-html="removeActionHTML"></div>
+                        <div>
+                            <button class="fr-btn fr-btn--secondary" @click="removeAction">
+                                Supprimer
+                            </button>
+                            <button class="fr-btn" type="button" aria-controls="remove-action-modal">
+                                Abandonner
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</dialog>
+        
+    </div>
+    <div id="storybook-tab-3-panel" class="fr-tabs__panel" role="tabpanel"
+         aria-labelledby="storybook-tab-3" tabindex="0">
+        <form v-on:submit="updateSuite"
+      id="suite-form">
+    <input type="hidden" name="id"
+           value="curSollicitation.id"/>
+    <div class="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
+        <div class="fr-col">
+            <div class="fr-select-group">
+                <label class="fr-label"
+                       for="suite-donnee-select">
+                    Suite donnée
+                </label>
+                <select class="fr-select"
+                        aria-describedby="suite-donnee-hint-messages"
+                        id="suite-donnee-select"
+                        name="Suite_donnee">
+                    <option></option>
+                    
+                    <option v-for="suite in suites">
+                        {{suite}}
+                    </option>
+                    
+                </select>
+                <div class="fr-messages-group"
+                     id="suite-donnee-hint-messages"
+                     aria-live="polite">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
+        <div class="fr-col">
+            <div class="fr-select-group">
+                <label class="fr-label" for="obs-interne-select">
+                    Observatoire interne
+                </label>
+                <select class="fr-select"
+                        aria-describedby="obs-interne-hint-messages"
+                        id="obs-interne-select"
+                        name="Impact_Observatoire_interne"
+                        multiple
+                >
+                    <option></option>
+                    
+                    <option v-for="obsInterne in obsInternes"
+                            v-bind:value="obsInterne.id">
+                        {{obsInterne.intitule}}
+                    </option>
+                    
+                </select>
+                <div class="fr-messages-group" id="obs-interne-hint-messages"
+                     aria-live="polite">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
+        <div class="fr-col">
+            <div class="fr-select-group">
+                <label class="fr-label" for="indicateur-select">
+                    Indicateur
+                </label>
+                <select class="fr-select"
+                        aria-describedby="indicateur-hint-messages"
+                        id="indicateur-select" name="Impact_Indicateurs_Reperes"
+                        multiple
+                >
+                    <option></option>
+                    
+                    <option v-for="indicateur in indicateurs"
+                            v-bind:value="indicateur.id">
+                        {{indicateur.intitule}}
+                    </option>
+                    
+                </select>
+                <div class="fr-messages-group" id="indicateur-hint-messages"
+                     aria-live="polite">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
+        <div class="fr-col">
+            <div class="fr-input-group"
+                 id="impact-methode">
+                <label class="fr-label"
+                       for="input-impact-methode">Impact : remarques sur la
+                    méthode
+                    co-construite</label>
+                <textarea class="fr-input"
+                          aria-describedby="input-impact-methode-messages"
+                          id="input-impact-methode"
+                          name="Impact_remarques_sur_la_mesure_co_construite"></textarea>
+                <div class="fr-messages-group"
+                     id="input-impact-methode-messages"
+                     aria-live="polite">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
+        <div class="fr-col">
+            
+            <div class="fr-highlight">
+                <p>{{curSollicitation.Action_principale_rattachee}}</p>
+            </div>
+            
+            <div class="fr-select-group">
+                <label class="fr-label" for="avec-questionnaire-select">
+                    Avec questionnaire :
+                </label>
+                <select class="fr-select"
+                        aria-describedby="avec-questionnaire-hint-messages"
+                        id="avec-questionnaire-select" name="Avec_questionnaire"
+                        @change="setAvecQuestionnaire"
+                >
+                    <option></option>
+                    
+                    <option v-for="text in avecQuestionnaireOptions"
+                            v-bind:value="text">
+                        {{text}}
+                    </option>
+                    
+                </select>
+                <div class="fr-messages-group"
+                     id="avec-questionnaire-hint-messages"
+                     aria-live="polite">
+                </div>
+            </div>
+        </div>
+        <div class="fr-col">
+            <div v-if="avecQuestionnaire === 'Unique'"
+                 class="fr-table fr-table--multiline">
+                <div class="fr-table__wrapper">
+                    <div class="fr-table__container">
+                        <div class="fr-table__content">
+                            <table>
+                                <caption>
+                                    Questionnaires
+                                </caption>
+                                <thead>
+                                <tr>
+                                    <th scope="col">Date envoi</th>
+                                    <th scope="col">Envoyé</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    
+                                    <td>
+                                        {{toDateString(curSollicitation.Date_action_principale)}}
+                                    </td>
+                                    
+                                    <td>
+                                        <div class="fr-checkbox-group">
+                                            <input id="checkbox_ppale"
+                                                   type="checkbox"
+                                                   name="Questionnaire_a_chaud_envoye"
+                                                   aria-describedby="checkbox_ppale-messages">
+                                            <label class="fr-label"
+                                                   for="checkbox_ppale">
+                                                Questionnaire envoyé
+                                            </label>
+                                            <div class="fr-messages-group"
+                                                 id="checkbox_ppale-messages"
+                                                 aria-live="polite">
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div v-if="avecQuestionnaire === 'Sur la durée'"
+                 class="fr-table fr-table--multiline">
+                <div class="fr-table__wrapper">
+                    <div class="fr-table__container">
+                        <div class="fr-table__content">
+                            <table>
+                                <caption>
+                                    Questionnaires
+                                </caption>
+                                <thead>
+                                <tr>
+                                    <th scope="col">Date envoi</th>
+                                    <th scope="col">Envoyé</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    
+                                    <td>
+                                        {{toDateString(curSollicitation.Date_action_principale)}}
+                                    </td>
+                                    
+                                    <td>
+                                        <div class="fr-checkbox-group">
+                                            <input id="checkbox_ppale"
+                                                   type="checkbox"
+                                                   name="Questionnaire_a_chaud_envoye"
+                                                   aria-describedby="checkbox_ppale-messages">
+                                            <label class="fr-label"
+                                                   for="checkbox_ppale">
+                                                Questionnaire envoyé
+                                            </label>
+                                            <div class="fr-messages-group"
+                                                 id="checkbox_ppale-messages"
+                                                 aria-live="polite">
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    
+                                    <td>
+                                        {{toDateString(curSollicitation.Date_action_6_mois)}}
+                                    </td>
+                                    
+                                    <td>
+                                        <div class="fr-checkbox-group">
+                                            <input id="checkbox_ppale6"
+                                                   type="checkbox"
+                                                   name="Questionnaire_6_mois"
+                                                   aria-describedby="checkbox_ppale6-messages">
+                                            <label class="fr-label"
+                                                   for="checkbox_ppale6">
+                                                Questionnaire envoyé
+                                            </label>
+                                            <div class="fr-messages-group"
+                                                 id="checkbox_ppale6-messages"
+                                                 aria-live="polite">
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    
+                                    <td>
+                                        {{toDateString(curSollicitation.Date_action_12_mois)}}
+                                    </td>
+                                    
+                                    <td>
+                                        <div class="fr-checkbox-group">
+                                            <input id="checkbox_ppale12"
+                                                   type="checkbox"
+                                                   name="Questionnaire_12_mois"
+                                                   aria-describedby="checkbox_ppale12-messages">
+                                            <label class="fr-label"
+                                                   for="checkbox_ppale12">
+                                                Questionnaire envoyé
+                                            </label>
+                                            <div class="fr-messages-group"
+                                                 id="checkbox_ppale12-messages"
+                                                 aria-live="polite">
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    
+                                    <td>
+                                        {{toDateString(curSollicitation.Date_action_24_mois)}}
+                                    </td>
+                                    
+                                    <td>
+                                        <div class="fr-checkbox-group">
+                                            <input id="checkbox_ppale24"
+                                                   type="checkbox"
+                                                   name="Questionnaire_24_mois"
+                                                   aria-describedby="checkbox_ppale24-messages">
+                                            <label class="fr-label"
+                                                   for="checkbox_ppale24">
+                                                Questionnaire envoyé
+                                            </label>
+                                            <div class="fr-messages-group"
+                                                 id="checkbox_ppale24-messages"
+                                                 aria-live="polite">
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
+        <div class="fr-col">
+            <div class="fr-input-group"
+                 id="bilan-impact">
+                <label class="fr-label"
+                       for="input-bilan-impact">Bilan impact</label>
+                <textarea class="fr-input"
+                          aria-describedby="input-impact-methode-messages"
+                          id="input-bilan-impact"
+                          name="Bilan_impact"></textarea>
+                <div class="fr-messages-group"
+                     id="input-bilan-impact-messages"
+                     aria-live="polite">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
+        <button class="fr-btn" type="submit">Valider</button>
+    </div>
+</form>
+    </div>
+</div>
+        </div>
+    </section>
+</main>
+
+</body>
+</html>

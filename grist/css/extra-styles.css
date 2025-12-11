@@ -1,0 +1,22 @@
+* {
+  box-sizing: border-box;
+}
+#base-container {
+  min-height: 420px;
+}
+
+/* Override the default container mode to allow fullscreen mode */
+[data-builder-fullscreen="true"] .fr-container {
+  max-width: none;
+}
+#ij0d {
+  position: absolute;
+  transform: translateY(-100%);
+  opacity: 0;
+}
+#i6d5iz {
+  max-width: 9.0625rem;
+}
+#i7irfi {
+  max-width: 8rem;
+}

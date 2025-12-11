@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta name="format-detection" content="telephone=no,date=no,address=no,email=no,url=no" />
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="css/dsfr.min.css" />
+    <link rel="stylesheet" href="css/utility.min.css" />
+    <link rel="stylesheet" href="css/dsfr.print.min.css" />
+    <link rel="stylesheet" href="css/extra-styles.css" />
+    <script src="js/dsfr.module.min.js" type="text/javascript"></script>
+    <script src="js/dsfr.nomodule.min.js" nomodule="" type="text/javascript"></script>
+
+    <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
+
+    <!-- tomselect -->
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/css/tom-select.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/js/tom-select.complete.min.js"></script>
+
+    <!-- Uses Vue.js and the Grist Plugin API -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.3/vue.min.js"></script>
+
+    <script src="lab_create.js?version=1"></script>
+
+    <title>Lab Innov</title>
+  </head>
+<body>
+
+<main id="content" role="main">
+    <div v-if="curSollicitation === null">
+        <div class="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
+            <div class="fr-col">
+                <div role="search" class="fr-search-bar">
+                    <label class="fr-label">Chercher une
+                        sollicitation</label>
+                    <input type="search" v-model="searchString"
+                           placeholder="Chercher une sollicitation"
+                           class="fr-input"/>
+                    <div aria-live="polite"
+                         class="fr-messages-group"></div>
+                    <button type="button"
+                            title="Chercher une sollicitation"
+                            class="fr-btn">Chercher une sollicitation
+                    </button>
+                </div>
+            </div>
+            <div class="fr-col">
+                <button class="fr-btn" type="button"
+                        v-on:click="newSollicitation">
+                    Nouvelle sollicitation
+                </button>
+            </div>
+        </div>
+        <div class="fr-grid-row fr-grid-row--gutters">
+            <div>
+                <ul>
+                    <li v-for="sollicitation in foundSollicitations"
+                        :key="sollicitation.id">
+                        
+                        <button class="fr-btn" type="button"
+                                v-on:click="chooseSollicitation(sollicitation.id)"
+                                v-bind:name="sollicitation.id">
+                            {{sollicitation.id}} - {{sollicitation.Identifiant}}
+                        </button>
+                        : {{sollicitation.Description}}
+                        
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div v-else>
+        <div class="fr-grid-row fr-grid-row--gutters">
+            <div class="fr-col-8">
+                <div class="fr-callout">
+                    
+                    <h3 class="fr-callout__title">
+                        {{curSollicitation.Identifiant}}</h3>
+                    <p class="fr-callout__text">
+                        {{curSollicitation.Description}}</p>
+                    <button class="fr-btn" type="button"
+                            v-on:click="resetCurSollicitation">X
+                    </button>
+                    
+                </div>
+            </div>
+            <div class="fr-col-2">
+                <button class="fr-btn" type="button" data-fr-opened="false"
+                        aria-controls="remove-sollicitation-modal"
+                        v-on:click="removeSollicitationDialog()"
+                >Effacer
+                </button>
+            </div>
+        </div>
+        <div class="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
+            <div class="fr-col-8">
+                <form v-on:submit="upsertSollicitationFromForm"
+                      id="create-sollicitation-form">
+                    <input type="hidden" name="id" value="curSollicitation.id"/>
+                    <section>
+    <h3>Quand et comment ?</h3>
+    <div class="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
+        <div class="fr-col">
+            <div class="fr-select-group">
+                <label class="fr-label" for="entree-select">
+                    Point d'entrée
+                </label>
+                <select class="fr-select"
+                        aria-describedby="participants-hint-messages"
+                        id="entree-select" name="Point_d_entree"
+                        required
+                >
+                    <option></option>
+                    
+                    <option v-for="participant in participants"
+                            v-bind:value="participant.id">
+                        {{participant.nom}}
+                    </option>
+                    
+                </select>
+                <div class="fr-messages-group" id="participants-hint-messages"
+                     aria-live="polite">
+                </div>
+            </div>
+        </div>
+        <div class="fr-col">
+            <div class="fr-input-group">
+                <label class="fr-label" for="date-input">
+                    Date sollicitation
+                </label>
+                <input class="fr-input"
+                       aria-describedby="input-messages"
+                       id="date-input" name="Date"
+                       type="date" required>
+                <div class="fr-messages-group" id="input-messages"
+                     aria-live="polite">
+                </div>
+            </div>
+        </div>
+        <div class="fr-col">
+            <div class="fr-select-group">
+                <label class="fr-label" for="mode-select">
+                    Mode de prise de contact
+                </label>
+                <select class="fr-select" aria-describedby="mode-hint-messages"
+                        id="mode-select" name="Mode_de_prise_de_contact" required>
+                    <option></option>
+                    
+                    <option v-for="mode in modes">
+                        {{mode}}
+                    </option>
+                    
+                </select>
+                <div class="fr-messages-group" id="mode-hint-messages"
+                     aria-live="polite">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+                    <section>
+    <h3>Qui ?</h3>
+    <div class="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
+        <div class="fr-col">
+        </div>
+        <div class="fr-col">
+        </div>
+    </div>
+    <div class="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
+        <div class="fr-col">
+            <div class="fr-input-group">
+                <label class="fr-label" for="origine-input">
+                    Origine
+                </label>
+                <input class="fr-input" aria-describedby="origine-messages"
+                       name="Origine" v-model="origineString"
+                       id="origine-input" type="text" required>
+                <div class="fr-messages-group" id="origine-messages"
+                     aria-live="polite">
+                </div>
+            </div>
+        </div>
+        <div class="fr-col">
+            <div class="fr-input-group">
+                <label class="fr-label" for="coords-input">
+                    Coordonnées
+                </label>
+                <input class="fr-input" aria-describedby="origine-messages"
+                       name="Coordonnees"  v-model="coordonneesString"
+                       id="coords-input" type="text">
+                <div class="fr-messages-group" id="coords-messages"
+                     aria-live="polite">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+                    <section>
+    <h3>
+        Quoi ?
+    </h3>
+    <div class="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
+        <div class="fr-col">
+            <div class="fr-input-group"
+                 id="description-sollicitation">
+                <label class="fr-label"
+                       for="description-sollicitation-area">
+                    Description</label>
+                <textarea class="fr-input"
+                          name="Description" v-model="descriptionString"
+                          aria-describedby="description-sollicitation-messages"
+                          id="description-sollicitation-area" required></textarea>
+                <div class="fr-messages-group"
+                     id="description-sollicitation-messages"
+                     aria-live="polite">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
+        <div class="fr-col">
+            <div class="fr-select-group">
+                <label class="fr-label" for="service-select">
+                    Service concerné
+                </label>
+                <select class="fr-select"
+                        aria-describedby="service-hint-messages"
+                        id="service-select" name="Service_concerne">
+                    <option></option>
+                    
+                    <option v-for="service in services" v-bind:value="service.id">
+                        {{service.libelle}}
+                    </option>
+                    
+                </select>
+                <div class="fr-messages-group" id="service-hint-messages"
+                     aria-live="polite">
+                </div>
+            </div>
+        </div>
+        <div class="fr-col">
+            <div class="fr-select-group">
+                <label class="fr-label" for="axes-select">
+                    Axe(s)
+                </label>
+                <select class="fr-select"
+                        aria-describedby="axes-hint-messages"
+                        id="axes-select" name="Axe" multiple required>
+                    
+                    <option v-for="axe in axes">
+                        {{axe}}
+                    </option>
+                    
+                </select>
+                <div class="fr-messages-group" id="axes-hint-messages"
+                     aria-live="polite">
+                </div>
+            </div>
+        </div>
+        <div class="fr-col">
+            <div class="fr-select-group">
+                <label class="fr-label" for="orientations-select">
+                    Orientation(s) possible(s)
+                </label>
+                <select class="fr-select"
+                        aria-describedby="orientations-hint-messages"
+                        id="orientations-select" name="Orientations_possibles"
+                        multiple>
+                    
+                    <option v-for="orientation in orientations">
+                        {{orientation}}
+                    </option>
+                    
+                </select>
+                <div class="fr-messages-group" id="orientations-hint-messages"
+                     aria-live="polite">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+                    <div class="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
+                        <div class="fr-col">
+                            <button v-if="curSollicitation.id" class="fr-btn"
+                                    type="submit">
+                                Modifier
+                            </button>
+                            <button v-else class="fr-btn" type="submit">
+                                Créer
+                            </button>
+                            <button class="fr-btn fr-btn--secondary"
+                                    type="button"
+                                    v-on:click="resetSollicitationForm">
+                                Effacer la saisie
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="fr-col-4">
+                <h3>Sollicitations similaires</h3>
+                <p>
+                <ul>
+                    
+                    <li v-for="similarSollicitation in similarSollicitations">
+                        {{similarSollicitation.Identifiant}}
+                        {{similarSollicitation.Description}}
+                    </li>
+                    
+                </ul>
+                </p>
+            </div>
+        </div>
+    </div>
+    <dialog id="remove-sollicitation-modal" class="fr-modal"
+            aria-labelledby="modal-title"
+            aria-modal="true">
+        <div class="fr-container fr-container--fluid fr-container-md">
+            <div class="fr-grid-row fr-grid-row--center">
+                <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
+                    <div class="fr-modal__body">
+                        <div class="fr-modal__header">
+                            <button aria-controls="remove-sollicitation-modal"
+                                    title="Fermer" type="button"
+                                    id="sollicitation-modal-close"
+                                    class="fr-btn--close fr-btn">Fermer
+                            </button>
+                        </div>
+                        <div class="fr-modal__content">
+                            <h2 id="modal-title" class="fr-modal__title">
+                                Supprimer une sollicitation
+                            </h2>
+                            <div v-html="removeSollicitationHTML"></div>
+                            <div>
+                                <button class="fr-btn fr-btn--secondary"
+                                        v-on:click="removeSollicitation()">
+                                    Supprimer
+                                </button>
+                                <button class="fr-btn" type="button"
+                                        aria-controls="remove-sollicitation-modal">
+                                    Abandonner
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </dialog>
+</main>
+
+</body>
+</html>

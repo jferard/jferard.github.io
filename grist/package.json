@@ -1,0 +1,22 @@
+{
+  "name": "@dgfip/lab_innov",
+  "description": "Widgets for Lab",
+  "homePage": "jferard",
+  "version": "0.0.1",
+  "grist": {
+    "name": "Lab",
+    "url": "lab",
+    "widgetId": "@dgfip/lab_innov",
+    "published": true,
+    "accessLevel": "full",
+    "renderAfterReady": true,
+    "description": "Tout pour le Lab",
+    "authors": [
+      {
+        "name": "Julien Férard",
+        "url": ""
+      }
+    ],
+    "isGristLabsMaintained": false
+  }
+}
