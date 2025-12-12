@@ -244,9 +244,11 @@
                                                 aria-describedby="mode-reunion-hint-messages"
                                                 id="mode-reunion-hint"
                                                 name="Mode_reunion">
+                                            
                                             <option v-for="mode in modesReunions">
-                                                
+                                                {{ mode }}
                                             </option>
+                                            
                                         </select>
                                         <div class="fr-messages-group"
                                              id="mode-reunion-hint-messages"
@@ -299,7 +301,7 @@
                                             
                                             <option v-for="participant in participants"
                                                     v-bind:value="participant.id">
-                                                {{participant.nom}}
+                                                {{ participant.nom }}
                                             </option>
                                             
                                         </select>
@@ -508,7 +510,7 @@
                                                 name="Type_de_travail">
                                             
                                             <option v-for="type in typesTravail">
-                                                {{type}}
+                                                {{ type }}
                                             </option>
                                             
                                         </select>
@@ -578,7 +580,7 @@
                                             
                                             <option v-for="participant in participants"
                                                     v-bind:value="participant.id">
-                                                {{participant.nom}}
+                                                {{ participant.nom }}
                                             </option>
                                             
                                         </select>
@@ -786,7 +788,7 @@
                                                 name="Mode_evenement">
                                             
                                             <option v-for="mode in modesReunions">
-                                                {{mode}}
+                                                {{ mode }}
                                             </option>
                                             
                                         </select>
@@ -841,7 +843,7 @@
                                             
                                             <option v-for="participant in participants"
                                                     v-bind:value="participant.id">
-                                                {{participant.nom}}
+                                                {{ participant.nom }}
                                             </option>
                                             
                                         </select>
