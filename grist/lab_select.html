@@ -140,9 +140,10 @@
                         <td>{{action.Duree_heures_.toLocaleString()}}</td>
                         <td>{{action.Total_heures_Lab.toLocaleString()}}</td>
                         <td>{{action.Action_principale ? "X" : ""}}</td>
+                        
                         <td>
                             <button data-fr-opened="false"
-                                    aria-controls="{{ modal }}"
+                                    aria-controls="create-reunion-modal"
                                     @click="openModifyActionDialog(action.id)">📝
                             </button>
                             <button data-fr-opened="false"
@@ -152,7 +153,6 @@
                             <button @click="setActionPrincipale(action.id)">🚩
                             </button>
                         </td>
-                        
                     </tr>
                     <tr>
                         <td colspan="3">Total</td>
@@ -402,9 +402,10 @@
                         <td>{{action.Duree_heures_.toLocaleString()}}</td>
                         <td>{{action.Total_heures_Lab.toLocaleString()}}</td>
                         <td>{{action.Action_principale ? "X" : ""}}</td>
+                        
                         <td>
                             <button data-fr-opened="false"
-                                    aria-controls="{{ modal }}"
+                                    aria-controls="create-travail-modal"
                                     @click="openModifyActionDialog(action.id)">📝
                             </button>
                             <button data-fr-opened="false"
@@ -414,7 +415,6 @@
                             <button @click="setActionPrincipale(action.id)">🚩
                             </button>
                         </td>
-                        
                     </tr>
                     <tr>
                         <td colspan="3">Total</td>
@@ -682,9 +682,10 @@
                         <td>{{action.Duree_heures_.toLocaleString()}}</td>
                         <td>{{action.Total_heures_Lab.toLocaleString()}}</td>
                         <td>{{action.Action_principale ? "X" : ""}}</td>
+                        
                         <td>
                             <button data-fr-opened="false"
-                                    aria-controls="{{ modal }}"
+                                    aria-controls="create-evenement-modal"
                                     @click="openModifyActionDialog(action.id)">📝
                             </button>
                             <button data-fr-opened="false"
@@ -694,7 +695,6 @@
                             <button @click="setActionPrincipale(action.id)">🚩
                             </button>
                         </td>
-                        
                     </tr>
                     <tr>
                         <td colspan="3">Total</td>
