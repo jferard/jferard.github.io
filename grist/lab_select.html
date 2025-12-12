@@ -430,6 +430,218 @@
         </div>
     </div>
     
+<button data-fr-opened="false" aria-controls="create-travail-modal"
+        @click='newActionDialog("T")'
+        type="button" class="fr-btn">Créer un travail
+</button>
+<dialog id="create-travail-modal" class="fr-modal"
+        aria-labelledby="modal-travaux-create" aria-modal="true">
+    <div class="fr-container fr-container--fluid fr-container-md">
+        <div class="fr-grid-row fr-grid-row--center">
+            <div class="fr-col-12 fr-col-md-12 fr-col-lg-12">
+                <div class="fr-modal__body">
+                    <div class="fr-modal__header">
+                        <button aria-controls="create-travail-modal"
+                                id="create-travail-modal-button"
+                                title="Fermer" type="button"
+                                class="fr-btn--close fr-btn">
+                            Fermer
+                        </button>
+                    </div>
+                    <div v-if="curAction" class="fr-modal__content">
+                        <h2 id="modal-travaux-create"
+                            class="fr-modal__title">
+                                            <span class="fr-icon-arrow-right-line fr-icon--lg"
+                                                  aria-hidden="true"></span>
+                            Le travail
+                        </h2>
+                        <form v-on:submit="upsertTravail"
+                              id="create-travail-form">
+                            <input type="hidden" name="id"
+                                   value="curAction.id"/>
+                            <div class="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
+                                <div class="fr-col">
+                                    <div class="fr-input-group"
+                                         id="titre-travail">
+                                        <label class="fr-label"
+                                               for="input-titre-travail">Titre
+                                            travail</label>
+                                        <input class="fr-input"
+                                               aria-describedby="input-titre-travail-messages"
+                                               id="input-titre-travail"
+                                               name="Titre"
+                                               type="text">
+                                        <div class="fr-messages-group"
+                                             id="input-titre-travail-messages"
+                                             aria-live="polite">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
+                                <div class="fr-col">
+                                    <div class="fr-input-group">
+                                        <label class="fr-label"
+                                               for="date-travail-input">
+                                            Date travail
+                                        </label>
+                                        <input class="fr-input"
+                                               aria-describedby="input-messages"
+                                               id="date-travail-input"
+                                               name="Date"
+                                               type="date">
+                                        <div class="fr-messages-group"
+                                             id="date-travail-input-messages"
+                                             aria-live="polite">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="fr-col">
+                                    <div class="fr-select-group">
+                                        <label class="fr-label"
+                                               for="type-travail-hint">
+                                            Type de travail
+                                        </label>
+                                        <select class="fr-select"
+                                                aria-describedby="type-travail-hint-messages"
+                                                id="type-travail-hint"
+                                                name="Type_de_travail">
+                                            
+                                            <option v-for="type in typesTravail">
+                                                {{type}}
+                                            </option>
+                                            
+                                        </select>
+                                        <div class="fr-messages-group"
+                                             id="mode-travail-hint-messages"
+                                             aria-live="polite">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="fr-col">
+                                    <div class="fr-range-group"
+                                         id="range-group-duree-travail">
+                                        <label class="fr-label"
+                                               id="duree-travail-range-input-label">
+                                            Durée du travail (heures)
+                                        </label>
+                                        <div class="fr-range"
+                                             data-fr-suffix=" h">
+                                            <span class="fr-range__output">1</span>
+                                            <input id="duree-travail-range-input"
+                                                   name="Duree_heures_"
+                                                   type="range"
+                                                   aria-labelledby="duree-travail-range-input-label"
+                                                   min="0" max="8"
+                                                   value="0"
+                                                   step="0.25"
+                                                   aria-describedby="duree-travail-range-input-messages">
+                                            <span class="fr-range__min"
+                                                  aria-hidden="true">0</span>
+                                            <span class="fr-range__max"
+                                                  aria-hidden="true">8</span>
+                                        </div>
+                                        <div class="fr-messages-group"
+                                             id="duree-travail-range-input-messages"
+                                             aria-live="polite">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="fr-col">
+                                    <div class="fr-checkbox-group">
+                                        <input id="checkbox" type="checkbox"
+                                               name="Travail_realise"
+                                               aria-describedby="checkbox-messages">
+                                        <label class="fr-label" for="checkbox">
+                                            Travail réalisé
+                                        </label>
+                                        <div class="fr-messages-group"
+                                             id="checkbox-messages"
+                                             aria-live="polite">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
+                                <div class="fr-col">
+                                    <div class="fr-select-group">
+                                        <label class="fr-label"
+                                               for="participants-travail-select">
+                                            Participants Lab
+                                        </label>
+                                        <select class="fr-select"
+                                                aria-describedby="participants-hint-messages"
+                                                id="participants-travail-select"
+                                                name="Participants_Lab"
+                                                multiple
+                                        >
+                                            
+                                            <option v-for="participant in participants"
+                                                    v-bind:value="participant.id">
+                                                {{participant.nom}}
+                                            </option>
+                                            
+                                        </select>
+                                        <div class="fr-messages-group"
+                                             id="participants-lab-travail-hint-messages"
+                                             aria-live="polite">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="fr-col">
+                                    <div class="fr-input-group"
+                                         id="participants-autres-travail-div">
+                                        <label class="fr-label"
+                                               for="participants-autres-travail">
+                                            Participants autres</label>
+                                        <textarea class="fr-input"
+                                                  name="Participants_Autres"
+                                                  aria-describedby="participants-autres-travail-messages"
+                                                  id="participants-autres-travail"></textarea>
+                                        <div class="fr-messages-group"
+                                             id="participants-autres-travail-messages"
+                                             aria-live="polite">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
+                                <div class="fr-col">
+                                    <div class="fr-input-group"
+                                         id="remarques-travail-div">
+                                        <label class="fr-label"
+                                               for="remarques-travail">
+                                            Remarques</label>
+                                        <textarea class="fr-input"
+                                                  name="Remarques"
+                                                  aria-describedby="remarques-travail-messages"
+                                                  id="remarques-travail"></textarea>
+                                        <div class="fr-messages-group"
+                                             id="remarques-travail-messages"
+                                             aria-live="polite">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
+                                <div class="fr-col">
+                                    <button v-if="curAction.id" class="fr-btn"
+                                            type="submit">
+                                        Modifier
+                                    </button>
+                                    <button v-else class="fr-btn" type="submit">
+                                        Créer
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</dialog>
+
 </div>
         
     </div>
@@ -498,6 +710,200 @@
         </div>
     </div>
     
+<button data-fr-opened="false" aria-controls="create-evement-modal" @click='newActionDialog("E")'
+        type="button" class="fr-btn">Créer un événement
+</button>
+<dialog id="create-evenement-modal" class="fr-modal"
+        aria-labelledby="modal-evenements-create" aria-modal="true">
+    <div class="fr-container fr-container--fluid fr-container-md">
+        <div class="fr-grid-row fr-grid-row--center">
+            <div class="fr-col-12 fr-col-md-12 fr-col-lg-12">
+                <div class="fr-modal__body">
+                    <div class="fr-modal__header">
+                        <button aria-controls="create-evenement-modal"
+                                id="create-evenement-modal-button"
+                                title="Fermer" type="button"
+                                class="fr-btn--close fr-btn">
+                            Fermer
+                        </button>
+                    </div>
+                    <div v-if="curAction" class="fr-modal__content">
+                        <h2 id="modal-evenements-create"
+                            class="fr-modal__title">
+                                            <span class="fr-icon-arrow-right-line fr-icon--lg"
+                                                  aria-hidden="true"></span>
+                            L'événement
+                        </h2>
+                        <form v-on:submit="upsertEvenement"
+                              id="create-evenement-form">
+                            <input type="hidden" name="id" value="curAction.id"/>
+                            <div class="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
+                                <div class="fr-col">
+                                    <div class="fr-input-group"
+                                         id="titre-evenement">
+                                        <label class="fr-label"
+                                               for="input-titre-evenement">Titre
+                                            événement</label>
+                                        <input class="fr-input"
+                                               aria-describedby="input-titre-evenement-messages"
+                                               id="input-titre-evenement"
+                                               name="Titre"
+                                               type="text">
+                                        <div class="fr-messages-group"
+                                             id="input-titre-evenement-messages"
+                                             aria-live="polite">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
+                                <div class="fr-col">
+                                    <div class="fr-input-group">
+                                        <label class="fr-label"
+                                               for="date-evenement-input">
+                                            Date événement
+                                        </label>
+                                        <input class="fr-input"
+                                               aria-describedby="input-messages"
+                                               id="date-evenement-input"
+                                               name="Date"
+                                               type="date">
+                                        <div class="fr-messages-group"
+                                             id="date-evenement-input-messages"
+                                             aria-live="polite">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="fr-col">
+                                    <div class="fr-select-group">
+                                        <label class="fr-label"
+                                               for="mode-evenement-hint">
+                                            Mode de 555
+                                        </label>
+                                        <select class="fr-select"
+                                                aria-describedby="mode-evenement-hint-messages"
+                                                id="mode-evenement-hint"
+                                                name="Mode_evenement">
+                                            
+                                            <option v-for="mode in modesReunions">
+                                                {{mode}}
+                                            </option>
+                                            
+                                        </select>
+                                        <div class="fr-messages-group"
+                                             id="mode-evenement-hint-messages"
+                                             aria-live="polite">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="fr-col">
+                                    <div class="fr-range-group"
+                                         id="range-group-duree-evenement">
+                                        <label class="fr-label"
+                                               id="duree-evenement-range-input-label">
+                                            Durée de l'événement (heures)
+                                        </label>
+                                        <div class="fr-range" data-fr-suffix=" h">
+                                            <span class="fr-range__output">1</span>
+                                            <input id="duree-evenement-range-input"
+                                                   name="Duree_heures_"
+                                                   type="range"
+                                                   aria-labelledby="duree-evenement-range-input-label"
+                                                   min="0" max="8"
+                                                   value="0"
+                                                   step="0.25"
+                                                   aria-describedby="duree-evenement-range-input-messages">
+                                            <span class="fr-range__min"
+                                                  aria-hidden="true">0</span>
+                                            <span class="fr-range__max"
+                                                  aria-hidden="true">8</span>
+                                        </div>
+                                        <div class="fr-messages-group"
+                                             id="duree-evenement-range-input-messages"
+                                             aria-live="polite">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
+                                <div class="fr-col">
+                                    <div class="fr-select-group">
+                                        <label class="fr-label"
+                                               for="participants-evenement-select">
+                                            Participants Lab
+                                        </label>
+                                        <select class="fr-select"
+                                                aria-describedby="participants-hint-messages"
+                                                id="participants-evenement-select"
+                                                name="Participants_Lab"
+                                                multiple
+                                        >
+                                            
+                                            <option v-for="participant in participants"
+                                                    v-bind:value="participant.id">
+                                                {{participant.nom}}
+                                            </option>
+                                            
+                                        </select>
+                                        <div class="fr-messages-group"
+                                             id="participants-lab-evenement-hint-messages"
+                                             aria-live="polite">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="fr-col">
+                                    <div class="fr-input-group"
+                                         id="participants-autres-evenement-div">
+                                        <label class="fr-label"
+                                               for="participants-autres-evenement">
+                                            Participants autres</label>
+                                        <textarea class="fr-input"
+                                                  name="Participants_Autres"
+                                                  aria-describedby="participants-autres-evenement-messages"
+                                                  id="participants-autres-evenement"></textarea>
+                                        <div class="fr-messages-group"
+                                             id="participants-autres-evenement-messages"
+                                             aria-live="polite">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
+                                <div class="fr-col">
+                                    <div class="fr-input-group"
+                                         id="remarques-evenement-div">
+                                        <label class="fr-label"
+                                               for="remarques-evenement">
+                                            Remarques</label>
+                                        <textarea class="fr-input"
+                                                  name="Remarques"
+                                                  aria-describedby="remarques-evenement-messages"
+                                                  id="remarques-evenement"></textarea>
+                                        <div class="fr-messages-group"
+                                             id="remarques-evenement-messages"
+                                             aria-live="polite">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
+                                <div class="fr-col">
+                                    <button v-if="curAction.id" class="fr-btn" type="submit">
+                                        Modifier
+                                    </button>
+                                    <button v-else class="fr-btn" type="submit">
+                                        Créer
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</dialog>
+
 </div>
         
     </div>
