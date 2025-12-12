@@ -438,6 +438,11 @@ class FormHelper {
             }
         }
     }
+
+    reset() {
+        console.log("Reset");
+        this.form.reset();
+    }
 }
 
 /** Retourne la liste des participants en promesse (id + nom) */
