@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr">
   <head>
-    <meta name="format-detection" content="telephone=no,date=no,address=no,email=no,url=no" />
+    <meta name="format-detection" content="" />
     <meta charset="UTF-8" />
     <link rel="stylesheet" href="css/dsfr.min.css" />
     <link rel="stylesheet" href="css/utility.min.css" />
@@ -19,9 +19,9 @@
     <!-- Uses Vue.js and the Grist Plugin API -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.3/vue.min.js"></script>
 
-    <script src="lab_select.js?version=1"></script>
+    <script src="lab_actions.js?version=1"></script>
 
-    <title>Lab Innov</title>
+    <title>Actions Lab</title>
   </head>
 <body>
 
@@ -935,6 +935,42 @@
                 </select>
                 <div class="fr-messages-group"
                      id="suite-donnee-hint-messages"
+                     aria-live="polite">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
+        <div class="fr-col">
+            <div class="fr-input-group"
+                 id="impact-constats">
+                <label class="fr-label"
+                       for="impact-constats-area">
+                    Impact : constats</label>
+                <textarea class="fr-input"
+                          name="Impact_constats"
+                          aria-describedby="impact-constats-messages"
+                          id="impact-constats-area" required></textarea>
+                <div class="fr-messages-group"
+                     id="impact-constats-messages"
+                     aria-live="polite">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
+        <div class="fr-col">
+            <div class="fr-input-group"
+                 id="impact-objectifs">
+                <label class="fr-label"
+                       for="impact-objectifs-area">
+                    Impact : objectifs</label>
+                <textarea class="fr-input"
+                          name="Impact_objectifs"
+                          aria-describedby="impact-objectifs-messages"
+                          id="impact-objectifs-area" required></textarea>
+                <div class="fr-messages-group"
+                     id="impact-objectifs-messages"
                      aria-live="polite">
                 </div>
             </div>

@@ -1,22 +1,40 @@
 {
-  "name": "@dgfip/lab_innov",
+  "name": "@dgfip/lab_innov_grand_est_com",
   "description": "Widgets for Lab",
   "homePage": "jferard",
   "version": "0.0.1",
-  "grist": {
-    "name": "Lab",
-    "url": "lab",
-    "widgetId": "@dgfip/lab_innov",
-    "published": true,
-    "accessLevel": "full",
-    "renderAfterReady": true,
-    "description": "Tout pour le Lab",
-    "authors": [
-      {
-        "name": "Julien Férard",
-        "url": ""
-      }
-    ],
-    "isGristLabsMaintained": false
-  }
+  "grist": [
+    {
+      "name": "Lab sollicitations",
+      "url": "https://jferard.github.io/grist/lab_sollicitations.html",
+      "widgetId": "@dgfip/lab_innov_grand_est_com#sollicitations",
+      "published": true,
+      "accessLevel": "full",
+      "renderAfterReady": true,
+      "description": "Sollicitations du Lab",
+      "authors": [
+        {
+          "name": "Julien Férard",
+          "url": "https://github.com/jferard"
+        }
+      ],
+      "isGristLabsMaintained": false
+    },
+    {
+      "name": "Lab",
+      "url": "https://jferard.github.io/grist/lab_actions.html",
+      "widgetId": "@dgfip/lab_innov_grand_est_com#actions",
+      "published": true,
+      "accessLevel": "full",
+      "renderAfterReady": true,
+      "description": "Actions du Lab",
+      "authors": [
+        {
+          "name": "Julien Férard",
+          "url": "https://github.com/jferard"
+        }
+      ],
+      "isGristLabsMaintained": false
+    }
+  ]
 }
