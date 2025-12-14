@@ -585,7 +585,7 @@ class TomSelectHandler {
         });
     }
 
-    cleanSuites() {
+    cleanImpact() {
         if (this.tomSelectSuitesObsInterne) {
             this.tomSelectSuitesObsInterne.destroy();
         }
@@ -594,7 +594,7 @@ class TomSelectHandler {
         }
     }
 
-    initSuites() {
+    initImpact() {
         console.log("Init TomSelect suites");
         const opts = Array.from(data.obsInternes).map((p) => { new Option(p.intitule, p.id) });
         this.tomSelectSuitesObsInterne = new TomSelect("#obs-interne-select", {
@@ -652,8 +652,23 @@ function onSollicitationSet() {
         // pass
     } else {
         refreshActions(data.curSollicitation.id);
+        refreshImpact();
         refreshSuites();
     }
+}
+
+function refreshImpact() {
+    /**
+     * Met à jour l'impact
+     */
+    Vue.nextTick().then(
+        () => {
+            tomSelectHandler.cleanImpact();
+            const helper = getImpactFormHelper();
+            helper.setRecord(data.curSollicitation);
+            tomSelectHandler.initImpact();
+        }
+    )
 }
 
 /**
@@ -663,10 +678,8 @@ function refreshSuites() {
     data.avecQuestionnaire = data.curSollicitation.Avec_questionnaire;
     Vue.nextTick().then(
         () => {
-            tomSelectHandler.cleanSuites();
             const helper = getSuitesFormHelper();
             helper.setRecord(data.curSollicitation);
-            tomSelectHandler.initSuites();
         }
     )
 }
