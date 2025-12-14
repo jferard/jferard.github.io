@@ -751,9 +751,27 @@ function setActionPrincipale(id) {
 /**
  * Met à jour la suite
  */
-function updateSuite(_event) {
-    console.log("updateSuite");
+function updateSuites(_event) {
+    console.log("updateSuites");
     const helper = getSuitesFormHelper();
+    const record = helper.getRecord();
+    const id = parseInt(record.id);
+    delete record["id"];
+    console.log(record);
+
+    data.sollicitationsHelper.updateSollicitation(record, id).then(
+        (sollicitation) => {
+            data.curSollicitation = sollicitation
+        }
+    )
+}
+
+/**
+ * Met à jour l'impact
+ */
+function updateImpact(_event) {
+    console.log("updateImpact");
+    const helper = getImpactFormHelper();
     const record = helper.getRecord();
     const id = parseInt(record.id);
     delete record["id"];
@@ -879,17 +897,24 @@ function upsertEvenement(event) {
 
 // *********************
 
-function getSuitesFormHelper() {
-    const form = document.getElementById("suite-form");
+function getImpactFormHelper() {
+    const form = document.getElementById("impact-form");
     const helper = new FormHelper(form);
     helper.initList("Impact_Observatoire_interne", (s) => parseInt(s, 10), (n) => n.toString());
     helper.initList("Impact_Indicateurs_Reperes", (s) => parseInt(s, 10), (n) => n.toString());
+    return helper;
+}
+
+function getSuitesFormHelper() {
+    const form = document.getElementById("suites-form");
+    const helper = new FormHelper(form);
     helper.initCheck("Questionnaire_a_chaud_envoye");
     helper.initCheck("Questionnaire_6_mois");
     helper.initCheck("Questionnaire_12_mois");
     helper.initCheck("Questionnaire_24_mois");
     return helper;
 }
+
 
 /**
  * Met l'affichage des données à jour
@@ -941,7 +966,8 @@ ready(function() {
             upsertTravail: upsertTravail,
             upsertReunion: upsertReunion,
             upsertEvenement: upsertEvenement,
-            updatesuite: updateSuite,
+            updateSuites: updateSuites,
+            updateImpact: updateImpact,
             searchSollicitation: searchSollicitation,
             chooseSollicitation: chooseSollicitation,
             setActionPrincipale: setActionPrincipale,
