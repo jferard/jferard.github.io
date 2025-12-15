@@ -631,6 +631,7 @@ let data = {
     modes: MODES_CONTACT,
     modesReunions: MODES_REUNION,
     typesTravail: TYPES_TRAVAIL,
+    typesEvenement: TYPES_EVENEMENT,
     axes: AXES,
     orientations: ORIENTATIONS,
     suites: SUITES,

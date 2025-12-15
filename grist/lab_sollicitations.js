@@ -544,7 +544,6 @@ var tomSelectOrientations = undefined;
 let data = {
     modes: MODES_CONTACT,
     modesReunions: MODES_REUNION,
-    typesEvenement: TYPES_EVENEMENT,
     axes: AXES,
     orientations: ORIENTATIONS,
     suites: SUITES,
