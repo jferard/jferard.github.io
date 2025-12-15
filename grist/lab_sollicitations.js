@@ -30,6 +30,17 @@ const TYPES_TRAVAIL = [
     "mise en ligne",
 ]
 
+const TYPES_EVENEMENT = [
+    "Facilitation",
+    "Médiation",
+    "Formation",
+    "Co-construction",
+    "Réunion",
+    "Autre",
+    "Pass'Innov",
+    "Présentation",
+]
+
 const AXES = [
     "Agents et équipes",
     "Métiers",
@@ -533,6 +544,7 @@ var tomSelectOrientations = undefined;
 let data = {
     modes: MODES_CONTACT,
     modesReunions: MODES_REUNION,
+    typesEvenement: TYPES_EVENEMENT,
     axes: AXES,
     orientations: ORIENTATIONS,
     suites: SUITES,
