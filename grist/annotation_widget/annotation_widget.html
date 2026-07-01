@@ -40,14 +40,14 @@
 
   const inputElement = document.getElementById("input");
   inputElement.addEventListener("change", handleFiles);
-  function handleFiles(files) {
-      console.log(files);
-      console.log(files[0]);
+  function handleFiles() {
+      console.log(this.files);
+      console.log(this.files[0]);
       const reader = new FileReader();
       reader.onload = (e) => {
         container2.innerHTML = reader.result;
       };
-      reader.readAsDataURL(files[0]);
+      reader.readAsDataURL(this.files[0]);
   }
 </script>
 
