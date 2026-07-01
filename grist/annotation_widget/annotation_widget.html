@@ -39,13 +39,13 @@
   });
 
   const inputElement = document.getElementById("input");
-  inputElement.addEventListener("change", handleFile);
-  function handleFile(file) {
+  inputElement.addEventListener("change", handleFiles);
+  function handleFiles(files) {
       const reader = new FileReader();
       reader.onload = (e) => {
         container2.innerHTML = reader.result;
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(files[0]);
   }
 </script>
 
