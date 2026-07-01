@@ -9,9 +9,12 @@
 <body>
 
 <div id="container"></div>
+<input type="file" id="input"/>
+<div id="container2"></div>
 
 <script>
   const container = document.getElementById('container');
+  const container2 = document.getElementById('container2');
 
   grist.ready({ requiredAccess: 'read table' });
   grist.onRecord(async (record) => {
@@ -34,6 +37,16 @@
       container.innerHTML = `<div class="error">Erreur : ${error.message}</div>`;
     }
   });
+
+  const inputElement = document.getElementById("input");
+  inputElement.addEventListener("change", handleFile);
+  function handleFile(file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        container2.innerHTML = reader.result;
+      };
+      reader.readAsDataURL(file);
+  }
 </script>
 
 </body>
