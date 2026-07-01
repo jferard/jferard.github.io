@@ -22,10 +22,14 @@
       if (!attachmentId) throw new Error("Aucune image trouvée.");
       const imageUrl = `${baseUrl}/attachments/${attachmentId}/download?auth=${token}`;
 
-      container.innerHTML = `
-        <img src="${imageUrl}" alt="Image Grist" /><br/>
-        <a href="${imageUrl}" target="_blank">Télécharger l'image</a>
-      `;
+      fetch(imageUrl)
+        .then(res => res.text())
+        .then(text => {
+          container.innerHTML = `
+          <p>${text}</p>
+          <a href="${imageUrl}" target="_blank">Télécharger l'image</a>
+        `;
+        });
     } catch (error) {
       container.innerHTML = `<div class="error">Erreur : ${error.message}</div>`;
     }
