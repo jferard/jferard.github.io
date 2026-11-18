@@ -227,6 +227,10 @@ class DocumentOutput {
           But you can use more complex layout: see <a href="https://github.com/jferard/grist-export-import-widget/blob/main/dsfr-example.html">dsfr-example.html</a>.
         </p>
 
+        <div class="developer-note">
+          Firefox: set <code>network.lna.blocking</code> to false for local testing (the widget must access localhost to retrieve attachments)
+        </div>
+
         <h2>Original custom widget builder help</h2>
         <h3>How to use this editor</h3>
         <p>
@@ -254,7 +258,6 @@ class DocumentOutput {
         <div class="note">
           <strong>Note:</strong> There is no autosave feature, so if you refresh the page without installing or saving, the widget content will be lost.
         </div>
-
 
         <div class="developer-note">
           <h3>Note for Developers</h3>

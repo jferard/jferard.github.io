@@ -464,13 +464,43 @@ class DefaultArchiveReader {
 class DefaultArchiveImporter {
     static async create(docApi, output) {
         const tokenInfo = await docApi.getAccessToken({readOnly: false});
-        return new DefaultArchiveImporter(docApi, tokenInfo, output);
+        const colInfoByColIdByTableId = await DefaultArchiveImporter.findColInfoByColIdByTableId(docApi);
+        return new DefaultArchiveImporter(docApi, tokenInfo, output, colInfoByColIdByTableId);
     }
 
-    constructor(docApi, tokenInfo, output) {
+    static async findColInfoByColIdByTableId(docApi) {
+        /*
+         * Analyse the current document.
+         * @param {Object} docApi - the grist doc API
+         * @returns {Map} tableId -> colId -> colType
+         */
+        const colTypeByColIdByTableId = new Map();
+        const gristColumns = await docApi.fetchTable("_grist_Tables_column");
+        const gristTables = await docApi.fetchTable("_grist_Tables");
+        gristColumns.parentId.forEach((parentId, index) => {
+            const tableIndex = gristTables.id.findIndex((id) => id === parentId);
+            const tableId = gristTables.tableId[tableIndex];
+            const colTypeByColId = colTypeByColIdByTableId.getOrInsert(tableId, new Map());
+            const colId = gristColumns.colId[index];
+            const colType = gristColumns.type[index];
+            const isFormula = gristColumns.isFormula[index];
+            const formula = gristColumns.formula[index];
+            const hasTriggerFormula = !isFormula && formula !== "";
+            let colInfo = {
+                "colType": colType,
+                "isFormula": isFormula,
+                "hasTriggerFormula": hasTriggerFormula
+            };
+            colTypeByColId.set(colId, colInfo);
+        });
+        return colTypeByColIdByTableId;
+    }
+
+    constructor(docApi, tokenInfo, output, colInfoByColIdByTableId) {
         this.docApi = docApi;
         this.tokenInfo = tokenInfo;
         this.output = output;
+        this.colInfoByColIdByTableId = colInfoByColIdByTableId;
     }
 
     async importArchive(archive) {
@@ -515,15 +545,23 @@ class DefaultArchiveImporter {
         console.info(`Actions: ${addActions.length} tables added`)
 
         const newIdsByTableId = this.buildNewIdsByTableId(addActions, result.retValues);
+        const newIdByOldIdByTableId = this.buildNewIdByOldIdByTableId(archive, newIdsByTableId);
+        console.info(newIdByOldIdByTableId);
 
         this.output.next("Écriture des colonnes références");
-        const updateActions = await this.#buildUpdateActions(archive, newIdsByTableId);
-        await this.docApi.applyUserActions(updateActions);
-        console.info(`Actions: ${updateActions.length} tables fixed`)
+        const updateRefsActions = await this.#buildUpdateRefsActions(
+            archive, newIdsByTableId, newIdByOldIdByTableId);
+        await this.docApi.applyUserActions(updateRefsActions);
+        console.info(`Actions: ${updateRefsActions.length} tables fixed`)
+
+        this.output.next("Écriture des colonnes formule d'initialisation");
+        const updateTriggerActions = await this.#buildUpdateTriggerActions(
+            archive, newIdsByTableId, newIdByOldIdByTableId);
+        await this.docApi.applyUserActions(updateTriggerActions);
+        console.info(`Trigger formulas: ${updateTriggerActions.length} tables fixed`)
     }
 
     async #buildAddActions(archive) {
-        const colInfoByColIdByTableId = await this.findColInfoByColIdByTableId();
         const importOptions = archive.importOptions;
 
         const addActions = Array();
@@ -536,7 +574,7 @@ class DefaultArchiveImporter {
                     continue;
                 }
             }
-            if (!colInfoByColIdByTableId.has(tableId)) {
+            if (!this.colInfoByColIdByTableId.has(tableId)) {
                 if (importOptions.ignoreExtraTables) {
                     console.warn(`Ignore extra table ${tableId} from the archive`);
                     continue;
@@ -544,7 +582,7 @@ class DefaultArchiveImporter {
                     throw Error();
                 }
             }
-            const colInfoByColId = colInfoByColIdByTableId.get(tableId);
+            const colInfoByColId = this.colInfoByColIdByTableId.get(tableId);
             const table = archive.tableById.get(tableId);
 
             const records = await this.#buildRecords(archive, colInfoByColId, table);
@@ -556,16 +594,13 @@ class DefaultArchiveImporter {
         return addActions;
     }
 
-    async #buildUpdateActions(archive, newIdsByTableId) {
-        const colInfoByColIdByTableId = await this.findColInfoByColIdByTableId();
-        const newIdByOldIdByTableId = this.buildNewIdByOldIdByTableId(archive, newIdsByTableId);
-        console.info(newIdByOldIdByTableId);
 
+    async #buildUpdateRefsActions(archive, newIdsByTableId, newIdByOldIdByTableId) {
         const updateActions = Array();
         const refListRegexp = new RegExp("^RefList:(.*)$");
         const refRegexp = new RegExp("^Ref:(.*)$");
         for (let [tableId, table] of archive.tableEntries()) {
-            let colInfoByColId = colInfoByColIdByTableId.get(tableId);
+            let colInfoByColId = this.colInfoByColIdByTableId.get(tableId);
             const records = {};
             for (let [colId, colInfo] of colInfoByColId.entries()) {
                 const refListM = colInfo.colType.match(refListRegexp);
@@ -609,7 +644,8 @@ class DefaultArchiveImporter {
                 }
             }
             if (Object.keys(records).length > 0) {
-                updateActions.push(["BulkUpdateRecord", tableId, newIdsByTableId.get(tableId), records]) // for each col
+                const newIds = newIdsByTableId.get(tableId);
+                updateActions.push(["BulkUpdateRecord", tableId, newIds, records]) // for each col
             }
         }
         console.log(updateActions)
@@ -665,7 +701,10 @@ class DefaultArchiveImporter {
                 }
             }
             if (colInfo.colType.startsWith("Ref:") || colInfo.colType.startsWith("RefList:")) {
-                console.info(`First pass: ignoring ref col ${colInfo.colId} (${colInfo.colType})`)
+                console.info(`First pass: ignore ref col: ${colId} (${colInfo.colType})`)
+                continue;
+            } else if (colInfo.hasTriggerFormula) {
+                console.info(`First pass: ignore col with trigger formula: ${colId} (${colInfo.colType})`)
                 continue;
             }
 
@@ -678,6 +717,27 @@ class DefaultArchiveImporter {
             records[colId] = newValues;
         }
         return records;
+    }
+
+    async #buildUpdateTriggerActions(archive, newIdsByTableId) {
+        const newIdByOldIdByTableId = this.buildNewIdByOldIdByTableId(archive, newIdsByTableId);
+        console.info(newIdByOldIdByTableId);
+
+        const updateActions = Array();
+        for (let [tableId, table] of archive.tableEntries()) {
+            let colInfoByColId = this.colInfoByColIdByTableId.get(tableId);
+            const records = {};
+            for (let [colId, colInfo] of colInfoByColId.entries()) {
+                if (colInfo.hasTriggerFormula) {
+                    records[colId] = table[colId];
+                }
+            }
+            if (Object.keys(records).length > 0) {
+                updateActions.push(["BulkUpdateRecord", tableId, newIdsByTableId.get(tableId), records]) // for each col
+            }
+        }
+        console.log(updateActions)
+        return updateActions;
     }
 
     async #uploadAttachments(values, attachmentDataById) {
@@ -731,27 +791,6 @@ class DefaultArchiveImporter {
         console.log(`Upload ${attachmentName}`)
         const result = await response.json();
         return result[0];
-    }
-
-    async findColInfoByColIdByTableId() {
-        /*
-         * @returns {Map} tableId -> colId -> colType
-         */
-        const colTypeByColIdByTableId = new Map();
-        const gristColumns = await this.docApi.fetchTable("_grist_Tables_column");
-        const gristTables = await this.docApi.fetchTable("_grist_Tables");
-        gristColumns.parentId.forEach((parentId, index) => {
-            const tableIndex = gristTables.id.findIndex((id) => id === parentId);
-            const tableId = gristTables.tableId[tableIndex];
-            const colTypeByColId = colTypeByColIdByTableId.getOrInsert(tableId, new Map());
-            const colId = gristColumns.colId[index];
-            const colType = gristColumns.type[index];
-            const isFormula = gristColumns.isFormula[index];
-            colTypeByColId.set(colId, {
-                "colType": colType, "isFormula": isFormula
-            });
-        });
-        return colTypeByColIdByTableId;
     }
 
     async getCurTemplateId() {
