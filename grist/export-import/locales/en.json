@@ -1,0 +1,25 @@
+{
+  "Export archive": "Export archive",
+  "Error": "Error: {{error}}",
+  "Add tables": "Add tables",
+  "Add attachments": "Add attachments",
+  "Write ZIP": "Write ZIP",
+  "Export archive...": "Export archive {{name}}...",
+  "End of export": "End of export",
+
+  "Import archive": "Import archive",
+  "Open file": "Open file {{name}}",
+  "Archive version":  "Archive version: {{id}} v{{version}}",
+  "Initialization": "Initialization",
+  "Prepare archive": "Prepare archive",
+  "Erase tables to overwrite": "Erase tables to overwrite",
+  "Write tables (without refs)": "Write tables (without refs)",
+  "Write ref columns": "Write ref columns",
+  "Write trigger formula columns": "Write trigger formula columns",
+  "Following dependencies have been found": "Following dependencies have been found : {{text}}. Use 'table.lookupOne()' to have weak dependencies",
+  "Table":  "Table {{tableId}}",
+  "Finalization": "Finalization",
+  "End of import": "End of import",
+
+  "Can't read ZIP": "Can't read ZIP file {{error}}"
+}
