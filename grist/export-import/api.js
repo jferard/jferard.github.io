@@ -47,6 +47,7 @@ const DEFAULT_HTML = `<!DOCTYPE html>
 `.trim();
 
 const DEFAULT_JS = `
+expimp.register({});
 `.trim();
 
 let htmlModel;

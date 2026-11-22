@@ -162,14 +162,38 @@
         </ul>
 
         <h4>JavaScript code</h4>
-        <p>You may extend the `DefaultArchiveExporter` and provide a `getArchiveName` method to provide a more convenient name to the export.</p>
+        <p>You have to register your parameters. If you register nothing, default behavior will apply.</p>
+        <pre><code>
+expimp.register({});
+        </code></pre>
+
+        <p>The parameters are:</p>
+        <pre><code>
+type ExpImpImportOptions = {
+    ignoreMeta: boolean
+    ignoreExtraTables: boolean
+    ignoreMissingCols: boolean
+    ignoreFormulas: boolean
+}
+
+type ExpImpUserParameters = {
+    exportId?: string
+    importId?: string
+    output?: Output
+    getArchiveName?: () => string
+    before?: (docApi: grist.GristDocAPI) => Promise&lt;void&gt;
+    prepareArchive?: (archive: Archive, meta: ExpImpMeta, output: Output) => Promise&lt;void&gt;
+    after?: (docApi: grist.GristDocAPI) => Promise&lt;void&gt;
+    importOptions?: Partial&lt;ExpImpImportOptions&gt;
+ }
+        </code></pre>
 
         <h3>The import</h3>
         <p>The import will read the archive and apply some functions to the data. You simply need to inherit from the default classes to
         tailor the data to the new document format.</p>
 
         <h4>The data</h4>
-        <p>You may extend the `DefaultArchiveImporter` and provide `before`, `prepareArchive` and `after` methods. The `prepareArchive` takes an `archive`
+        <p>You may provide `before`, `prepareArchive` and `after` methods. The `prepareArchive` takes an `archive`
         argument, that is an object of type `Archive`, with the following in-place methods:</p>
         <ul>
           <li><code>filterRows(tableId, func)</code></li>
